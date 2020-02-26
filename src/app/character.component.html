@@ -1,0 +1,149 @@
+<mat-card>
+  <mat-card-title fxLayout="row" fxLayoutAlign="space-between center">
+    <span>Character</span>
+    <span fxFlex></span>
+    <span style="font-size: 50%;">
+      Points:
+      {{ game.startingPoints }} Starting /
+      {{ character.usedPoints }} Used /
+      {{ gameService.availablePoints }} Available
+    </span>
+  </mat-card-title>
+  <mat-card-content>
+    <div fxLayout="row wrap" fxLayoutAlign="center center" fxLayoutGap="1em">
+      <mat-form-field fxFlex="nogrow">
+        <mat-label>Species</mat-label>
+        <mat-select [(ngModel)]="character.species" (change)="onChange()">
+          <mat-option *ngFor="let option of Species" [value]="option">
+            {{ option.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field fxFlex="nogrow">
+        <mat-label>Character Name</mat-label>
+        <input matInput [(ngModel)]="character.name" (change)="onChange()">
+      </mat-form-field>
+
+      <mat-form-field fxFlex="nogrow">
+        <mat-label>Gender</mat-label>
+        <mat-select [(ngModel)]="character.info.gender" (change)="onChange()">
+          <mat-option *ngFor="let option of Gender" [value]="option">{{ option }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field fxFlex="nogrow">
+        <mat-label>Height</mat-label>
+        <input matInput [(ngModel)]="character.info.height" (change)="onChange()">
+      </mat-form-field>
+
+      <mat-form-field fxFlex="nogrow">
+        <mat-label>Weight</mat-label>
+        <input matInput [(ngModel)]="character.info.weight" (change)="onChange()">
+      </mat-form-field>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<br>
+
+<mat-card>
+  <mat-card-title>
+    <span>Configuration</span>
+  </mat-card-title>
+  <mat-card-content>
+    <mat-tab-group>
+      <mat-tab label="Build">
+        <div fxLayout="row" fxLayoutGap="1em">
+          <div fxFlex="50%" style="padding: 1em;">
+            <strong>Primary Attributes</strong>
+            <table *ngIf="character.primaryAttributes.size > 0">
+              <thead>
+                <tr>
+                  <th>Attribute</th>
+                  <th>Score</th>
+                  <th>Cost</th>
+                  <th>Min</th>
+                  <th>Max</th>
+                  <th>Valid</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let PA of PrimaryAttributes">
+                  <td>{{ PA }}</td>
+                  <td>
+                    <mat-form-field>
+                      <input matInput type="number" value="{{ character.primaryAttributes.get(PA).score }}"
+                        (change)="updatePrimaryAttribute($event, PA)" />
+                    </mat-form-field>
+                  </td>
+                  <td>{{ character.primaryAttributes.get(PA).cost }}</td>
+                  <td>{{ character.primaryAttributes.get(PA).min}}</td>
+                  <td>{{ character.primaryAttributes.get(PA).max}}</td>
+                  <td>{{ character.isPrimaryValidAttribute(PA) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <mat-card fxFlex="50%">
+            <mat-card-content>
+              <table *ngIf="character.subAttributes.size > 0">
+                <thead>
+                  <tr>
+                    <th>Attribute</th>
+                    <th>Score</th>
+                    <th>Cost</th>
+                    <th>Min</th>
+                    <th>Max</th>
+                    <th>Valid</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let SA of SubAttributes">
+                    <td>{{ SA }}</td>
+                    <!-- <td>{{ character.subAttributes.get(SA).score }}</td> -->
+                    <mat-form-field>
+                      <input matInput type="number" value="{{ character.subAttributes.get(SA).score }}"
+                        (change)="updateSubAttribute($event, SA)" />
+                    </mat-form-field>
+                    <td>{{ character.subAttributes.get(SA).cost }}</td>
+                    <td>{{ character.subAttributes.get(SA).min}}</td>
+                    <td>{{ character.subAttributes.get(SA).max}}</td>
+                    <td>{{ character.isSubValidAttribute(SA) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Spells">
+        <button mat-raised-button color="primary" (click)="openSpellsDialog()">Add Spell</button>
+
+        <table mat-table [dataSource]="character.spells" style="width: 100%;">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef> Name </th>
+              <td mat-cell *matCellDef="let spell"> {{ spell.name }} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="level">
+              <th mat-header-cell *matHeaderCellDef> Level </th>
+              <td mat-cell *matCellDef="let spell"> {{ spell.level }} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="reduction">
+              <th mat-header-cell *matHeaderCellDef matTooltip="Reduction"> Benefit </th>
+              <td mat-cell *matCellDef="let spell"> {{ spell.reduction }} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="spellsTableColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: spellsTableColumns;"></tr>
+        </table>
+      </mat-tab>
+
+      <mat-tab label="Gear"> Content 3 </mat-tab>
+    </mat-tab-group>
+  </mat-card-content>
+</mat-card>

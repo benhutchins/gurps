@@ -1,0 +1,178 @@
+<mat-card class="mat-elevation-z3">
+  <mat-card-title fxLayout="row" fxLayoutAlign="space-between center">
+    <span>Character: {{ character.name }}</span>
+    <span fxFlex></span>
+    <span style="font-size: 50%;">
+      Points:
+      {{ game.startingPoints }} Starting /
+      {{ character.usedPoints }} Used /
+      {{ gameService.availablePoints }} Available
+    </span>
+  </mat-card-title>
+  <mat-card-content>
+    <div fxLayout="row wrap" fxLayoutAlign="center center" fxLayoutGap="1em">
+      <mat-card fxFlex="nogrow" *ngIf="character.species">
+        <mat-card-title>Species</mat-card-title>
+        <mat-card-content>{{ character.species.name }}</mat-card-content>
+      </mat-card>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<br>
+
+<div fxLayout="row" fxLayoutGap="1em">
+  <mat-card fxFlex="50%" class="mat-elevation-z3">
+    <mat-card-title>
+      Damage Calculator
+    </mat-card-title>
+    <mat-card-content>
+      <div fxLayout="column" style="width: 100%;">
+        <div fxLayout="row" fxLayout="space-between" matTooltip="Base ST is just the number that is on your character sheet as the Strength Score.">
+          <strong fxFlex>Strength</strong>
+          <span fxFlex>
+            {{ character.strength }}
+          </span>
+        </div>
+      </div>
+      <table border="0" cellpadding="1" cellspacing="0">
+        <tr>
+          <th>Magic ST Bonus Level (Percentage)</th>
+          <td class="tbCell">
+            <input type="number" [(ngModel)]="buckets.magic" />
+          </td>
+          <td class="help-text">
+            The Magic ST Bonus Level field is looking for the base bonus to ST that you have from all buff spells active,
+            like the
+            Gorilla Strength spell or the Mighty Roar
+            spell. They provide a bonus of +1 OR +10% whichever is greater. This calculator knows that. If the total bonus
+            you get
+            from whatever combination of spells is
+            +4 or +40% whichever is greater, you can just enter a value of "4" in the input box.
+          </td>
+        </tr>
+        <tr>
+          <th>Magic Flat ST Bonus</th>
+          <td class="tbCell">
+            <input type="text" maxlength="4" [(ngModel)]="buckets.magicFlat" class="tbInput" />
+          </td>
+          <td class="help-text">
+            Some of the buff spells that can provide ST give a flat bonus without offering a percentile possibility. And
+            example is
+            Shape Change which gives you temporary
+            character points that can be spent to give yourself improved traits like Strength. It will always be in the form
+            of +5
+            or something like that. In that case you
+            would just enter the value "5" in the input box.
+          </td>
+        </tr>
+        <tr>
+          <th>Surge of Rage level</th>
+          <td class="tbCell">
+            <input type="number" min="0" max="9" [(ngModel)]="buckets.surge" />
+          </td>
+          <td class="help-text">
+            The value for the Surge of Rage can be 1 to 6 currently, and it works like the normal buff spells such that each
+            surge
+            point gives you a +X or +Y%. Each surge point
+            spent gives you +3 or +25% whichever is higher. All you need to enter in the input box is the number of surge
+            points
+            spent, and the calculator will do the rest.
+            One important reminder is that the surge bonus is applied before any magic bonuses, so instead of adding
+            percents like
+            the normal buff spells do, they multiply.
+          </td>
+        </tr>
+        <tr>
+          <th>Skill Damage Bonus</th>
+          <td class="tbCell"><input type="text" maxlength="2" id="SkillBonus" class="tbInput" /></td>
+          <td class="help-text">
+            Skill Damage Bonus is about skill training allowing you to do more damage when you strike. At the time of
+            creation of
+            this calculator, the only two skills that
+            grant a damage bonus are Brawling and Karate. If your Brawling skill is at least 2 levels higher than your
+            Dexterity
+            score, you get a +1 to damage unarmed. If
+            your Karate skill is one level higher than your DX score, you get +1 damage... and if your Karate skill is at
+            least 2
+            levels higher than your DX score, you get
+            +2 to unarmed damage. But if future changes are made to allow high skill with weapons to improve damage the
+            calculator
+            still works. Just enter the bonus to damage.
+          </td>
+        </tr>
+        <tr>
+          <th>Weapon Master Level</th>
+          <td class="tbCell"><input type="text" maxlength="1" id="WeaponExp" class="tbInput" /></td>
+          <td class="help-text">
+            Weapon Master grants you a damage bonus when using a particular type of weapon, and the bonus comes in the form
+            of +X or
+            +Y per base die of damage. X and Y depend
+            on your level of the advantage. With the first level (costing 5 character points), you get +2 or +1/die. With
+            the second
+            level (costing 10 CP) you get +4 or +2/die.
+            What you enter into this form is the level of your advantage, so "1" or "2".
+          </td>
+        </tr>
+        <tr>
+          <th>Weapon Flat Modifier</th>
+          <td class="tbCell"><input type="text" maxlength="2" id="WeaponFlatMod" class="tbInput" /></td>
+          <td class="help-text">
+            Weapon Flat Modifier is referring to the modifier that comes with the weapon itself. Weapons in the book list
+            their
+            damage as something like "Thr+2" or "Thr-1". A
+            Longsword is more likely to do higher damage than a Small Dagger. This field is where you'd enter the "2" or the
+            "-1"
+            (from the example). Whatever your weapon damage
+            modifier is, is what goes in this input field.
+          </td>
+        </tr>
+        <tr>
+          <th>Magic Flat Modifier</th>
+          <td class="tbCell"><input type="text" maxlength="2" id="MagicFlatMod" class="tbInput" /></td>
+          <td class="help-text">
+            Weapon buff spells come with a damage bonus that you can include here. But this could be for any temporary bonus
+            you
+            don't want to overwrite the weapon Flat Mod with.
+          </td>
+        </tr>
+        <tr>
+          <th>Weapon Flat or Per Die Mod</th>
+          <td class="tbCell"><input type="text" maxlength="2" id="WeaponOrFlat" class="tbInputNarrow" /><input type="text"
+              maxlength="2" id="WeaponOrPerDie" class="tbInputNarrow" /></td>
+          <td class="help-text">
+            Some spells or effects grant a bonus to damage that is either flat or depend on the number of dice of damage.
+            And they
+            might not follow a pattern. So, you'll see that
+            there are actually two input boxes next to "Weapon Flat or Per Die Mod". The left field takes the flat value,
+            and the
+            right field takes the per die value. When figuring
+            out the final damage of your attack, the calculator will pick the one that results in a higher bonus.
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" align="center" class="btnCell"><input type="button" value="Calculate..." class="btnStyle"
+            d>
+        </tr>
+        <tr>
+          <th>Resulting ST Score</th>
+          <td id="ResultST" class="resultCell">?</td>
+        </tr>
+        <tr>
+          <th>Resulting Damage</th>
+          <td id="ResultDmg" class="resultCell">?</td>
+        </tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card fxFlex="50%" class="mat-elevation-z3">
+    <mat-card-title>
+      <span>Active Spells</span>
+    </mat-card-title>
+
+    <mat-card-content>
+      …
+    </mat-card-content>
+  </mat-card>
+</div>
